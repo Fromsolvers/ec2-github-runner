@@ -11,10 +11,12 @@ class Config {
       subnetId: core.getInput('subnet-id'),
       securityGroupId: core.getInput('security-group-id'),
       label: core.getInput('label'),
-      ec2InstanceId: core.getInput('ec2-instance-id'),
+      labels: core.getInput('labels'),
+      ec2InstanceIds: core.getInput('ec2-instance-id'),
       iamRoleName: core.getInput('iam-role-name'),
       runnerHomeDir: core.getInput('runner-home-dir'),
       preRunnerScript: core.getInput('pre-runner-script'),
+      instanceQuantity: core.getInput('instance-quantity')
     };
 
     const tags = JSON.parse(core.getInput('aws-resource-tags'));
@@ -58,6 +60,12 @@ class Config {
 
   generateUniqueLabel() {
     return Math.random().toString(36).substr(2, 5);
+  }
+  getLabels() {
+    return JSON.parse(this.labels)
+  }
+  getec2InstanceIds(){
+    return JSON.parse(this.ec2InstanceIds)
   }
 }
 
