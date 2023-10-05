@@ -31,6 +31,7 @@ function areRunnersNotBusy(runners){
     var result = true
     runners.forEach((runner) => {
       if (runner.busy){
+        core.info(`GitHub self-hosted runner number ${runner.name}, is still busy`);
         result = false
       }
     });
@@ -78,9 +79,8 @@ async function removeRunners() {
     core.info(`No GitHub self-hosted runners with labels ${separateArrayWithCommas(config.getLabels())} found, so the removal is skipped`);
     return;
   }
-  // Wait until all runner are not in "online" state
-
-
+  // Wait until all runner are not in busy state
+  await waitForRunnersNotBusy(config.getLabels())
   // Use Promise.all to remove runners asynchronously
   const removalPromises = runners.map(async (runner) => {
     try {
