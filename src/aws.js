@@ -6,11 +6,11 @@ function separateArrayWithCommas(arr) {
   if (!Array.isArray(arr)) {
     return "Input is not an array";
   }
-  // Use the join() method to concatenate array elements into a string
+
   return arr.join(",");
 }
 function retrieveInstanceIDsFromArrayofMaps(arrayOfMaps) {
-  // Check if the input is an array
+
   if (!Array.isArray(arrayOfMaps)) {
     return "Input is not an array";
   }
@@ -61,8 +61,8 @@ async function startEc2Instances(labels, githubRegistrationToken) {
   const params = {
     ImageId: config.input.ec2ImageId,
     InstanceType: config.input.ec2InstanceType,
-    MinCount: config.input.instanceQuantity,
-    MaxCount: config.input.instanceQuantity,
+    MinCount: config.input.numberOfInstances,
+    MaxCount: config.input.numberOfInstances,
     UserData: Buffer.from(userData.join('\n')).toString('base64'),
     SubnetId: config.input.subnetId,
     SecurityGroupIds: [config.input.securityGroupId],
@@ -72,9 +72,9 @@ async function startEc2Instances(labels, githubRegistrationToken) {
 
   try {
     const result = await ec2.runInstances(params).promise();
-    const ec2InstancesIds = retrieveInstanceIDsFromArrayofMaps(result.Instances)
-    core.info(`AWS EC2 instances ${separateArrayWithCommas(ec2InstancesIds)} are started`);
-    return ec2InstancesIds;
+    const ec2InstanceIds = retrieveInstanceIDsFromArrayofMaps(result.Instances)
+    core.info(`AWS EC2 instances ${separateArrayWithCommas(ec2InstanceIds)} are started`);
+    return ec2InstanceIds;
   } catch (error) {
     core.error('AWS EC2 instances starting error');
     throw error;
@@ -85,15 +85,15 @@ async function terminateEc2Instances() {
   const ec2 = new AWS.EC2();
 
   const params = {
-    InstanceIds: config.getec2InstanceIds(),
+    InstanceIds: config.getEc2InstanceIds(),
   };
 
   try {
     await ec2.terminateInstances(params).promise();
-    core.info(`AWS EC2 instances ${separateArrayWithCommas(config.getec2InstanceIds())} are terminated`);
+    core.info(`AWS EC2 instances ${separateArrayWithCommas(config.getEc2InstanceIds())} are terminated`);
     return;
   } catch (error) {
-    core.error(`AWS EC2 instances ${separateArrayWithCommas(config.getec2InstanceIds())} termination error`);
+    core.error(`AWS EC2 instances ${separateArrayWithCommas(config.getEc2InstanceIds())} termination error`);
     throw error;
   }
 }

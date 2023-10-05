@@ -43,7 +43,7 @@ inputs:
       The label is used to remove the runner from GitHub when the runner is not needed anymore.
       This input is required if you use the 'stop' mode.
     required: true
-  ec2-instances-ids:
+  ec2-instance-ids:
     description: >-
       EC2 Instance Id of the created runner.
       The id is used to terminate the EC2 instance when the runner is not needed anymore.
@@ -69,10 +69,11 @@ inputs:
     description: >-
       Specifies bash commands to run before the runner starts. It's useful for installing dependencies with apt-get, yum, dnf, etc.
     required: false
-  instance-quantity:
+  number-of-instances:
     description: >-
       Specifies how many runner to run
     required: false
+    default: 1
 
 
 outputs:
@@ -82,7 +83,7 @@ outputs:
       The label is used in two cases:
       - to use as the input of 'runs-on' property for the following jobs;
       - to remove the runner from GitHub when it is not needed anymore.
-  ec2-instances-ids:
+  ec2-instance-ids:
     description: >-
       EC2 Instances Ids of the created runners.
       The id is used to terminate the EC2 instance when the runner is not needed anymore.

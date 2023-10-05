@@ -11,11 +11,11 @@ class Config {
       subnetId: core.getInput('subnet-id'),
       securityGroupId: core.getInput('security-group-id'),
       labels: core.getInput('labels'),
-      ec2InstanceIds: core.getInput('ec2-instances-ids'),
+      ec2InstanceIds: core.getInput('ec2-instance-ids'),
       iamRoleName: core.getInput('iam-role-name'),
       runnerHomeDir: core.getInput('runner-home-dir'),
       preRunnerScript: core.getInput('pre-runner-script'),
-      instanceQuantity: core.getInput('instance-quantity')
+      numberOfInstances: core.getInput('number-of-instances')
     };
 
     const tags = JSON.parse(core.getInput('aws-resource-tags'));
@@ -49,7 +49,7 @@ class Config {
         throw new Error(`Not all the required inputs are provided for the 'start' mode`);
       }
     } else if (this.input.mode === 'stop') {
-      if (!this.input.label || !this.input.ec2InstanceId) {
+      if (!this.input.labels || !this.input.ec2InstanceIds) {
         throw new Error(`Not all the required inputs are provided for the 'stop' mode`);
       }
     } else {
@@ -61,10 +61,10 @@ class Config {
     return Math.random().toString(36).substr(2, 5);
   }
   getLabels() {
-    return JSON.parse(this.labels)
+    return JSON.parse(this.input.labels)
   }
-  getec2InstanceIds(){
-    return JSON.parse(this.ec2InstanceIds)
+  getEc2InstanceIds(){
+    return JSON.parse(this.input.ec2InstanceIds)
   }
 }
 
