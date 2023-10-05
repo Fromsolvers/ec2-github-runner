@@ -12,7 +12,7 @@ function separateArrayWithCommas(arr) {
   return arr.join(",");
 }
 
-function areRunnersOnline(runners){
+function areRunnersOnline(runners) {
   if (runners){
     runners.forEach((runner) => {
       if (runner.status !== 'online'){
@@ -26,7 +26,7 @@ function areRunnersOnline(runners){
   }  
 }
 
-function areRunnersNotBusy(runners){
+function areRunnersNotBusy(runners) {
   if (runners){
     core.info(`Checking if runners are not busy`);
     runners.forEach((runner) => {
@@ -72,6 +72,41 @@ async function getRegistrationToken() {
     throw error;
   }
 }
+
+async function waitForRunnersNotBusy(labels) {
+  const timeoutMinutes = 5;
+  const retryIntervalSeconds = 10;
+  const quietPeriodSeconds = 30;
+  let waitSeconds = 0;
+
+  core.info(`Waiting ${quietPeriodSeconds}s for the AWS EC2 instances be not busy in GitHut`);
+  await new Promise(r => setTimeout(r, quietPeriodSeconds * 1000));
+  core.info(`Checking every ${retryIntervalSeconds}s if the GitHub self-hosted runners are not busy`);
+
+  return new Promise((resolve, reject) => {
+    const interval = setInterval(async () => {
+      const runners = await getRunners(labels);
+
+      if (waitSeconds > timeoutMinutes * 60) {
+        core.error('GitHub self-hosted runners failed to be not busy -> TIMEOUT');
+        clearInterval(interval);
+        reject(`A timeout of ${timeoutMinutes} minutes is exceeded. Your AWS EC2 instances were not able to be not busy.`);
+      }
+
+      if (areRunnersNotBusy(runners)) {
+        runners.forEach((runner, index ) => {
+          core.info(`GitHub self-hosted runner number ${index}, ${runner.name}, is not busy`);
+        });
+        clearInterval(interval);
+        resolve();
+      } else {
+        waitSeconds += retryIntervalSeconds;
+        core.info('Checking...');
+      }
+    }, retryIntervalSeconds * 1000);
+  });
+}
+
 async function removeRunners() {
   const runners = await getRunners(config.getLabels());
   const octokit = github.getOctokit(config.input.githubToken);
@@ -126,40 +161,6 @@ async function waitForRunnersRegistered(labels) {
       if (areRunnersOnline(runners)) {
         runners.forEach((runner, index ) => {
           core.info(`GitHub self-hosted runner number ${index}, ${runner.name}, is registered and ready to use`);
-        });
-        clearInterval(interval);
-        resolve();
-      } else {
-        waitSeconds += retryIntervalSeconds;
-        core.info('Checking...');
-      }
-    }, retryIntervalSeconds * 1000);
-  });
-}
-
-async function waitForRunnersNotBusy(labels) {
-  const timeoutMinutes = 5;
-  const retryIntervalSeconds = 10;
-  const quietPeriodSeconds = 30;
-  let waitSeconds = 0;
-
-  core.info(`Waiting ${quietPeriodSeconds}s for the AWS EC2 instances be not busy in GitHut`);
-  await new Promise(r => setTimeout(r, quietPeriodSeconds * 1000));
-  core.info(`Checking every ${retryIntervalSeconds}s if the GitHub self-hosted runners are not busy`);
-
-  return new Promise((resolve, reject) => {
-    const interval = setInterval(async () => {
-      const runners = await getRunners(labels);
-
-      if (waitSeconds > timeoutMinutes * 60) {
-        core.error('GitHub self-hosted runners failed to be not busy -> TIMEOUT');
-        clearInterval(interval);
-        reject(`A timeout of ${timeoutMinutes} minutes is exceeded. Your AWS EC2 instances were not able to be not busy.`);
-      }
-
-      if (areRunnersNotBusy(runners)) {
-        runners.forEach((runner, index ) => {
-          core.info(`GitHub self-hosted runner number ${index}, ${runner.name}, is not busy`);
         });
         clearInterval(interval);
         resolve();
