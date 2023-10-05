@@ -69,6 +69,11 @@ inputs:
     description: >-
       Specifies bash commands to run before the runner starts. It's useful for installing dependencies with apt-get, yum, dnf, etc.
     required: false
+  instance-quantity:
+    description: >-
+      Specifies how many runner to run
+    required: false
+
 
 outputs:
   labels:
@@ -77,9 +82,9 @@ outputs:
       The label is used in two cases:
       - to use as the input of 'runs-on' property for the following jobs;
       - to remove the runner from GitHub when it is not needed anymore.
-  ec2-instance-id:
+  ec2-instances-ids:
     description: >-
-      EC2 Instance Id of the created runner.
+      EC2 Instances Ids of the created runners.
       The id is used to terminate the EC2 instance when the runner is not needed anymore.
 runs:
   using: node16
