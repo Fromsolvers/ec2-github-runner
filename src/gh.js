@@ -14,7 +14,7 @@ function separateArrayWithCommas(arr) {
 
 function areRunnersOnline(runners){
   if (runners){
-    result = true
+    var result = true
     runners.forEach((runner) => {
       if (runner.status !== 'online'){
         result = false
@@ -31,9 +31,9 @@ async function getRunners(multiple_labels) {
   const octokit = github.getOctokit(config.input.githubToken);
 
   try {
-    const foundRunners = await octokit.paginate('GET /repos/{owner}/{repo}/actions/runners', config.githubContext);
+    var foundRunners = await octokit.paginate('GET /repos/{owner}/{repo}/actions/runners', config.githubContext);
     multiple_labels.forEach((label) => {
-      const foundRunners = _.filter(foundRunners, { labels: [{ name: label }] });
+      foundRunners = _.filter(foundRunners, { labels: [{ name: label }] });
     });
     
     return foundRunners.length > 0 ? foundRunners : null;

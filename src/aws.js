@@ -47,7 +47,7 @@ function buildUserDataScript(githubRegistrationToken, labels) {
       'curl -O -L https://github.com/actions/runner/releases/download/v2.299.1/actions-runner-linux-${RUNNER_ARCH}-2.299.1.tar.gz',
       'tar xzf ./actions-runner-linux-${RUNNER_ARCH}-2.299.1.tar.gz',
       'export RUNNER_ALLOW_RUNASROOT=1',
-      `./config.sh --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --token ${githubRegistrationToken} --labels ${labels_str}`,
+      `./config.sh --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --token ${githubRegistrationToken} --labels ${separateArrayWithCommas(labels)}`,
       './run.sh',
     ];
   }

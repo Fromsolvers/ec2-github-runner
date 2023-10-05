@@ -5,7 +5,7 @@ const core = require('@actions/core');
 
 function setOutput(labels, ec2InstanceIds) {
   core.setOutput('labels', JSON.stringify(labels));
-  core.setOutput('ec2-instance-ids', JSON.stringify(ec2InstanceIds));
+  core.setOutput('ec2-instances-ids', JSON.stringify(ec2InstanceIds));
 }
 
 async function start() {
