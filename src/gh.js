@@ -14,29 +14,31 @@ function separateArrayWithCommas(arr) {
 
 function areRunnersOnline(runners){
   if (runners){
-    var result = true
     runners.forEach((runner) => {
       if (runner.status !== 'online'){
-        result = false
+        core.info(`GitHub self-hosted runner number ${runner.name}, is not online yet`);
+        return false
       }
     });
-    return result
+    return true
   } else {
-    return false
+    return true
   }  
 }
 
 function areRunnersNotBusy(runners){
   if (runners){
-    var result = true
+    core.info(`Checking if runners are not busy`);
     runners.forEach((runner) => {
       if (runner.busy){
         core.info(`GitHub self-hosted runner number ${runner.name}, is still busy`);
-        result = false
+        return false
       }
     });
-    return result
+    core.info(`All runners are not busy`);
+    return true
   } else {
+    core.info(`There are no more runners`);
     return false
   }  
 }
