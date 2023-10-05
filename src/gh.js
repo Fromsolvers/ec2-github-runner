@@ -25,6 +25,20 @@ function areRunnersOnline(runners){
     return false
   }  
 }
+
+function areRunnersNotBusy(runners){
+  if (runners){
+    var result = true
+    runners.forEach((runner) => {
+      if (runner.busy){
+        result = false
+      }
+    });
+    return result
+  } else {
+    return false
+  }  
+}
 // use the unique label to find the runner
 // as we don't have the runner's id, it's not possible to get it in any other way
 async function getRunners(multiple_labels) {
@@ -64,6 +78,8 @@ async function removeRunners() {
     core.info(`No GitHub self-hosted runners with labels ${separateArrayWithCommas(config.getLabels())} found, so the removal is skipped`);
     return;
   }
+  // Wait until all runner are not in "online" state
+
 
   // Use Promise.all to remove runners asynchronously
   const removalPromises = runners.map(async (runner) => {
@@ -119,8 +135,43 @@ async function waitForRunnersRegistered(labels) {
   });
 }
 
+async function waitForRunnersNotBusy(labels) {
+  const timeoutMinutes = 5;
+  const retryIntervalSeconds = 10;
+  const quietPeriodSeconds = 30;
+  let waitSeconds = 0;
+
+  core.info(`Waiting ${quietPeriodSeconds}s for the AWS EC2 instances be not busy in GitHut`);
+  await new Promise(r => setTimeout(r, quietPeriodSeconds * 1000));
+  core.info(`Checking every ${retryIntervalSeconds}s if the GitHub self-hosted runners are not busy`);
+
+  return new Promise((resolve, reject) => {
+    const interval = setInterval(async () => {
+      const runners = await getRunners(labels);
+
+      if (waitSeconds > timeoutMinutes * 60) {
+        core.error('GitHub self-hosted runners failed to be not busy -> TIMEOUT');
+        clearInterval(interval);
+        reject(`A timeout of ${timeoutMinutes} minutes is exceeded. Your AWS EC2 instances were not able to be not busy.`);
+      }
+
+      if (areRunnersNotBusy(runners)) {
+        runners.forEach((runner, index ) => {
+          core.info(`GitHub self-hosted runner number ${index}, ${runner.name}, is not busy`);
+        });
+        clearInterval(interval);
+        resolve();
+      } else {
+        waitSeconds += retryIntervalSeconds;
+        core.info('Checking...');
+      }
+    }, retryIntervalSeconds * 1000);
+  });
+}
+
 module.exports = {
   getRegistrationToken,
+  waitForRunnersNotBusy,
   removeRunners,
   waitForRunnersRegistered,
 };
