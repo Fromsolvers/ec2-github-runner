@@ -13,14 +13,17 @@ function separateArrayWithCommas(arr) {
 }
 
 function areRunnersOnline(runners) {
-  if (runners){
+  core.info("Here at areRunnersOnline")
+  core.info(runners)
+  if(runners){
+    core.info("Critical logger")
+    var result = true
     runners.forEach((runner) => {
       if (runner.status !== 'online'){
-        core.info(`GitHub self-hosted runner number ${runner.name}, is not online yet`);
-        return false
+        result = false
       }
     });
-    return true
+    return result
   } else {
     return true
   }  
