@@ -13,6 +13,10 @@ function separateArrayWithCommas(arr) {
 }
 
 function areRunnersOnline(runners){
+  core.info("Here at areRunnersOnline")
+  runners.forEach((runner, index ) => {
+    core.info(`This runner ${index}, ${runner.name}, will be checked`);
+  });
   if (runners){
     var result = true
     runners.forEach((runner) => {
