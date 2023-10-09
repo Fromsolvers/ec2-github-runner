@@ -23,7 +23,7 @@ function areRunnersOnline(runners) {
     });
     return true
   } else {
-    return true
+    return false
   }  
 }
 
