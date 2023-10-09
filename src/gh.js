@@ -28,6 +28,8 @@ function areRunnersOnline(runners) {
 }
 
 function areRunnersNotBusy(runners) {
+  core.info("Here at areRunnersNotBusy")
+  core.info(runners)
   if (runners){
     core.info(`Checking if runners are not busy`);
     runners.forEach((runner) => {
