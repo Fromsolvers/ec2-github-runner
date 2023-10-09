@@ -2,8 +2,6 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 const _ = require('lodash');
 const config = require('./config');
-
-
 function separateArrayWithCommas(arr) {
   if (!Array.isArray(arr)) {
     return "Input is not an array";
@@ -15,15 +13,15 @@ function separateArrayWithCommas(arr) {
 function areRunnersOnline(runners) {
   core.info("Here at areRunnersOnline")
   core.info(runners)
-  if(runners){
+  if (runners){
     core.info("Critical logger")
-    var result = true
     runners.forEach((runner) => {
-      if (runner.status !== 'online'){
-        result = false
+      if (runner.status !== 'online'){  
+        core.info(`GitHub self-hosted runner number ${runner.name}, is not online yet`);
+        return false
       }
     });
-    return result
+    return true
   } else {
     return true
   }  
@@ -49,7 +47,6 @@ function areRunnersNotBusy(runners) {
 // as we don't have the runner's id, it's not possible to get it in any other way
 async function getRunners(multiple_labels) {
   const octokit = github.getOctokit(config.input.githubToken);
-
   try {
     var foundRunners = await octokit.paginate('GET /repos/{owner}/{repo}/actions/runners', config.githubContext);
     multiple_labels.forEach((label) => {
@@ -61,11 +58,9 @@ async function getRunners(multiple_labels) {
     return null;
   }
 }
-
 // get GitHub Registration Token for registering a self-hosted runner
 async function getRegistrationToken() {
   const octokit = github.getOctokit(config.input.githubToken);
-
   try {
     const response = await octokit.request('POST /repos/{owner}/{repo}/actions/runners/registration-token', config.githubContext);
     core.info('GitHub Registration Token is received');
@@ -113,7 +108,6 @@ async function waitForRunnersNotBusy(labels) {
 async function removeRunners() {
   const runners = await getRunners(config.getLabels());
   const octokit = github.getOctokit(config.input.githubToken);
-
   // skip the runner removal process if no runners are found
   if (!runners || runners.length === 0) {
     core.info(`No GitHub self-hosted runners with labels ${separateArrayWithCommas(config.getLabels())} found, so the removal is skipped`);
@@ -131,7 +125,6 @@ async function removeRunners() {
       throw error;
     }
   });
-
   try {
     await Promise.all(removalPromises);
     core.info('All GitHub self-hosted runners are removed');
@@ -140,27 +133,22 @@ async function removeRunners() {
     throw error;
   }
 }
-
 async function waitForRunnersRegistered(labels) {
   const timeoutMinutes = 5;
   const retryIntervalSeconds = 10;
   const quietPeriodSeconds = 30;
   let waitSeconds = 0;
-
   core.info(`Waiting ${quietPeriodSeconds}s for the AWS EC2 instances to be registered in GitHub as a new self-hosted runner`);
   await new Promise(r => setTimeout(r, quietPeriodSeconds * 1000));
   core.info(`Checking every ${retryIntervalSeconds}s if the GitHub self-hosted runner is registered`);
-
   return new Promise((resolve, reject) => {
     const interval = setInterval(async () => {
       const runners = await getRunners(labels);
-
       if (waitSeconds > timeoutMinutes * 60) {
         core.error('GitHub self-hosted runner registration error');
         clearInterval(interval);
         reject(`A timeout of ${timeoutMinutes} minutes is exceeded. Your AWS EC2 instance was not able to register itself in GitHub as a new self-hosted runner.`);
       }
-
       if (areRunnersOnline(runners)) {
         runners.forEach((runner, index ) => {
           core.info(`GitHub self-hosted runner number ${index}, ${runner.name}, is registered and ready to use`);
