@@ -15,10 +15,8 @@ function separateArrayWithCommas(arr) {
 function areRunnersOnline(runners){
   core.info("Here at areRunnersOnline")
   core.info(runners)
-  runners.forEach((runner, index ) => {
-    core.info(`This runner ${index}, ${runner.name}, will be checked`);
-  });
-  if (runners){
+  if(runners){
+    core.info("Critical logger")
     var result = true
     runners.forEach((runner) => {
       if (runner.status !== 'online'){
