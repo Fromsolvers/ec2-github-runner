@@ -152,6 +152,7 @@ async function waitForRunnersRegistered(labels) {
         reject(`A timeout of ${timeoutMinutes} minutes is exceeded. Your AWS EC2 instance was not able to register itself in GitHub as a new self-hosted runner.`);
       }
       if (areRunnersOnline(runners)) {
+        core.info("Are Runners Online")
         runners.forEach((runner, index ) => {
           core.info(`GitHub self-hosted runner number ${index}, ${runner.name}, is registered and ready to use`);
         });
