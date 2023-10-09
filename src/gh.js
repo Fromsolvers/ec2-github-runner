@@ -14,6 +14,7 @@ function separateArrayWithCommas(arr) {
 
 function areRunnersOnline(runners){
   core.info("Here at areRunnersOnline")
+  core.info(runners)
   runners.forEach((runner, index ) => {
     core.info(`This runner ${index}, ${runner.name}, will be checked`);
   });
@@ -102,6 +103,8 @@ async function waitForRunnersRegistered(labels) {
   return new Promise((resolve, reject) => {
     const interval = setInterval(async () => {
       const runners = await getRunners(labels);
+      core.info("After getRunners")
+      core.info(runners)
 
       if (waitSeconds > timeoutMinutes * 60) {
         core.error('GitHub self-hosted runner registration error');
