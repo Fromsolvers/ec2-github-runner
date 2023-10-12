@@ -4,9 +4,12 @@ const github = require('@actions/github');
 class Config {
   constructor() {
     let label_list = JSON.parse(core.getInput('labels'));
-    label_list.push(this.generateUniqueLabel())
+    let mode_option = core.getInput('mode')
+    if (mode_option === 'start'){
+      label_list.push(this.generateUniqueLabel())
+    }
     this.input = {
-      mode: core.getInput('mode'),
+      mode: mode_option,
       githubToken: core.getInput('github-token'),
       ec2ImageId: core.getInput('ec2-image-id'),
       ec2InstanceType: core.getInput('ec2-instance-type'),
