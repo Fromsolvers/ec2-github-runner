@@ -3,8 +3,8 @@ const github = require('@actions/github');
 
 class Config {
   constructor() {
-    let label_list = JSON.parse(core.getInput('labels'));
-    let mode_option = core.getInput('mode')
+    const label_list = JSON.parse(core.getInput('labels'));
+    const mode_option = core.getInput('mode')
     if (mode_option === 'start'){
       label_list.push(this.generateUniqueLabel())
     }
