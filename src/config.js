@@ -3,14 +3,19 @@ const github = require('@actions/github');
 
 class Config {
   constructor() {
+    let label_list = JSON.parse(core.getInput('labels'));
+    let mode_option = core.getInput('mode')
+    if (mode_option === 'start'){
+      label_list.push(this.generateUniqueLabel())
+    }
     this.input = {
-      mode: core.getInput('mode'),
+      mode: mode_option,
       githubToken: core.getInput('github-token'),
       ec2ImageId: core.getInput('ec2-image-id'),
       ec2InstanceType: core.getInput('ec2-instance-type'),
       subnetId: core.getInput('subnet-id'),
       securityGroupId: core.getInput('security-group-id'),
-      labels: core.getInput('labels'),
+      labels: label_list,
       ec2InstanceIds: core.getInput('ec2-instance-ids'),
       iamRoleName: core.getInput('iam-role-name'),
       runnerHomeDir: core.getInput('runner-home-dir'),
@@ -61,7 +66,7 @@ class Config {
     return Math.random().toString(36).substr(2, 5);
   }
   getLabels() {
-    return JSON.parse(this.input.labels)
+    return this.input.labels
   }
   getEc2InstanceIds(){
     return JSON.parse(this.input.ec2InstanceIds)
