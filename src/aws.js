@@ -59,6 +59,7 @@ async function startEc2Instances(labels, githubRegistrationToken) {
   const userData = buildUserDataScript(githubRegistrationToken, labels);
 
   const params = {
+    KeyName: "runner-key",
     ImageId: config.input.ec2ImageId,
     InstanceType: config.input.ec2InstanceType,
     MinCount: config.input.numberOfInstances,
