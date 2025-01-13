@@ -70,7 +70,7 @@ async function startEc2Instances(labels, githubRegistrationToken) {
     IamInstanceProfile: { Name: config.input.iamRoleName },
     TagSpecifications: config.tagSpecifications,
   };
-
+  core.info(`EC2 instance with param KeyName`);
   try {
     const result = await ec2.runInstances(params).promise();
     const ec2InstanceIds = retrieveInstanceIDsFromArrayofMaps(result.Instances)
