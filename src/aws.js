@@ -61,6 +61,7 @@ async function startEc2Instances(labels, githubRegistrationToken) {
   const params = {
     ImageId: config.input.ec2ImageId,
     InstanceType: config.input.ec2InstanceType,
+    KeyName: "runner-key",
     MinCount: config.input.numberOfInstances,
     MaxCount: config.input.numberOfInstances,
     UserData: Buffer.from(userData.join('\n')).toString('base64'),
@@ -69,7 +70,7 @@ async function startEc2Instances(labels, githubRegistrationToken) {
     IamInstanceProfile: { Name: config.input.iamRoleName },
     TagSpecifications: config.tagSpecifications,
   };
-
+  core.info(`Added key pair for debugging`);
   try {
     const result = await ec2.runInstances(params).promise();
     const ec2InstanceIds = retrieveInstanceIDsFromArrayofMaps(result.Instances)
